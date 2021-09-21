@@ -1,0 +1,28 @@
+{
+  "name": "videotests-billing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Andrik154/videotests-billing.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Andrik154/videotests-billing/issues"
+  },
+  "homepage": "https://github.com/Andrik154/videotests-billing#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-subdomain": "^1.0.5",
+    "pg": "^8.7.1",
+    "puppeteer": "^10.2.0",
+    "request": "^2.88.2"
+  }
+}
