@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-window.API_LINK = 'http://tests.amoga.net:443/api';
+window.API_LINK = 'https://tests.toolstools.herokuapp.com/api';
 
 ReactDOM.render(
   <React.StrictMode>
