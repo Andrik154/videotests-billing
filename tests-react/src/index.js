@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-window.API_LINK = 'http://tests.amoga.net:8080/api';
+window.API_LINK = 'http://tests.amoga.net:443/api';
 
 ReactDOM.render(
   <React.StrictMode>

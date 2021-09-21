@@ -2,6 +2,7 @@ const e = require('express');
 const express = require('express');
 const router = express.Router();
 const request = require('request');
+const crypto = require('crypto');
 const db = require('../connectdb.js');
 
 router.post('/addtest', (req,res)=>{
@@ -239,6 +240,68 @@ router.post('/getcash', (req,res)=>{
             res.json({"success":true,"cash":resq[0].cash});
         }
     })
+})
+router.post('/promo', (req,res)=>{
+    const promo = req.body.promo;
+    if(promo){
+        db.query({text:"SELECT multiplier FROM public.promos WHERE promo=$1",values:[promo]},(err,resq)=>{
+            if(err){
+                res.json({
+                    success: false
+                })
+            } else if (resq.length==0){
+                res.json({
+                    success:true,
+                    goodPromo:false,
+                    multiplier:1.0
+                })
+            } else {
+                res.json({
+                    success:true,
+                    goodPromo:true,
+                    multiplier:parseFloat(resq[0].multiplier)
+                })
+            }
+        })
+    } else {
+        res.json({
+            success: false
+        })
+    }
+})
+router.post('/paymentqiwiapi', (req,res)=>{
+    console.log('paymentqiwiapi')
+    let myhash = crypto.createHmac('sha256', process.env.QIWISKEY);
+    let data = req.body.bill;
+    let hash = req.headers['X-Api-Signature-SHA256'];
+    let invoice_parameters = `${data.amount.currency}|${data.amount.value}|${data.billId}|${data.siteId}|${data.status.value}`;
+    myhash.update(invoice_parameters).digest('hex');
+    if(hash==myhash){
+        var multiplier = 0;
+        if (data.customFields.promo!=""){
+            db.query({text:'SELECT multiplier FROM public.promos WHERE promo=$1', values:[data.customFields.promo]},(err,resq)=>{
+                if(err){
+                    res.sendStatus(500);
+                } else {
+                    multiplier = resq[0].multiplier;
+                }
+            })
+        } else {
+            multiplier = 1.0;
+        }
+        let finalAmount = parseInt(parseFloat(data.amount.value)*multiplier*100);
+        db.query({text:"INSERT INTO public.orders(type,price,details,customer) VALUES('payment',$1,$2,$3)",values:[finalAmount,data.billId,data.customer.account]});
+        db.query({text:'UPDATE public.users SET cash = cash + $1 WHERE login=$2', values:[finalAmount, data.customer.account]}, (err,resq)=>{
+            if(err){
+                res.sendStatus(500);
+            } else {
+                res.sendStatus(200);
+            }
+        })
+    } else {
+        res.sendStatus(406);
+    }
+
 })
 router.post('/signin', (req,res)=>{
     request.post({

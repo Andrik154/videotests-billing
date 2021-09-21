@@ -10,6 +10,7 @@ import Usertest from './components/Usertest';
 import Addtest from './components/Addtest';
 import Purchase from './components/Purchase';
 import Afterlife from './components/Afterlife';
+import Payment from './components/Payment';
 
 function App() {
   const [location, setLocation] = useLocation();
@@ -75,8 +76,9 @@ function App() {
           <div className="col-12 col-md-10 col-lg-8 d-flex align-items-center mx-auto px-2">
             <Link href="/"><h4 id="logo">TestiKupitOnlain</h4></Link>
             <Link href="/usertests" style={{marginLeft:"30px"}}>Доступные тесты</Link>
+            <Link href="/pay" style={{marginLeft:"30px"}}>Пополнить</Link>
             <div style={{"marginLeft":"auto"}}>
-                  {user?<span id="acc">{additionalData.pupil.firstname} {cash/100>>0}.{cash%100} RUR<span style={{marginLeft:"8px"}}>(<a href="#" onClick={(e)=>{e.preventDefault();localStorage.removeItem('user'); setLocation('/signin'); setuser(null);}}>Sign out</a>)</span></span>:<Link href="/signin">Войти</Link>}
+                  {user?<span id="acc">{additionalData.pupil.firstname} {cash/100>>0}.{cash%100} RUR<span style={{marginLeft:"8px"}}>(<a href="#" onClick={(e)=>{e.preventDefault();localStorage.removeItem('user'); setLocation('/signin'); setuser(null);}}>Выйти</a>)</span></span>:<Link href="/signin">Войти</Link>}
             </div>
           </div>
         </header> 
@@ -89,6 +91,7 @@ function App() {
               <Route path="/purchase/:id">{(p)=>{return (<Purchase id={p.id} user={user} additionalData={additionalData} cash={cash} setcash={setcash}/>)}}</Route>
               <Route path="/signin" component={()=> <Signin setuser={setuser} setAdditionalData={setAdditionalData}/>} />
               <Route path="/afterlife" component={Afterlife} />
+              <Route path="/pay" component={()=><Payment user={user} />} />
           </div>
         </main>
         <footer className="border-top bg-light">

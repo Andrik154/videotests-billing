@@ -69,22 +69,22 @@ function Signin(props){
     return(
         <div className="col-12 col-md-5 rounded mx-auto mt-5 border rounded-0">
             <div className="border-bottom mb-1 px-3 pt-2 bg-light">
-                <h5>Sign in</h5>
+                <h5>Вход</h5>
             </div>
             <form onSubmit={signin} className="px-3 py-2">
                 <div className="row text-danger mb-2" hidden={!nosuccess}>
                     <div className="col-sm-12">
-                        Login/password is incorrect  
+                        Неверный логин/пароль
                     </div>
                 </div>
                 <div className="row">
-                    <label for="inputLogin" className="col-4 col-form-label">Login</label>
+                    <label for="inputLogin" className="col-4 col-form-label">Логин</label>
                     <div className="col-8">
                         <input name="inputLogin" type="text" placeholder="2281488" className="w-100" defaultValue={savedcreds&&savedcreds[0]} disabled={toggleblock} required/>
                     </div>
                 </div>
                 <div className="row">
-                    <label for="inputPass" className="col-4 col-form-label">Password</label>
+                    <label for="inputPass" className="col-4 col-form-label">Пароль</label>
                     <div className="col-8">
                         <input name="inputPass" type="text" placeholder="3ad6" className="w-100" defaultValue={savedcreds&&savedcreds[1]} disabled={toggleblock} required/>
                     </div>
@@ -96,13 +96,13 @@ function Signin(props){
                         <div className="form-check">
                             <input class="form-check-input" type="checkbox" name="save" value/>
                             <label class="form-check-label" for="save">
-                                Save credentials
+                                Сохранить реквизиты
                             </label>
                         </div>
                     </div>
                 </div>
                 <div className="d-flex align-items-center mt-2">
-                    <button name="submit" type="submit" class="btn btn-primary" disabled={toggleblock}>Sign in</button>
+                    <button name="submit" type="submit" class="btn btn-primary" disabled={toggleblock}>Войти</button>
                     <div className="mx-3" hidden={!toggleblock}>
                         <div class="spinner-border" role="status">
                             <span class="visually-hidden">Loading...</span>
