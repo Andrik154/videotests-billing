@@ -4,7 +4,7 @@ const router = express.Router();
 
 const tests = require('./tests-main');
 
-router.use('/tests/', tests);
+router.use('/tests', tests);
 
 router.use('/', (req,res)=>{
     res.status(404).send('Error 404 ;)');
