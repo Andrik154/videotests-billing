@@ -27,7 +27,7 @@ function Payment(props){
                 themeCode: "Andrei-LLlD4scgVW"
             },
             lifetime: `${dateHandler(new Date(Date.now()+25*60e3))}`,
-            successUrl: `${window.location.origin}/tests/success?amount=${ui.toFixed(2)}`
+            successUrl: `${window.location.origin}/tests/success?amount=${(ui*checkedPromo.multiplier).toFixed(2)}`
         }
         const {customFields, ...restP} = payload;
         const qsp = new URLSearchParams({...restP});
