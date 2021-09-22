@@ -279,8 +279,8 @@ router.post('/paymentqiwiapi', (req,res)=>{
     console.log(hash)
     console.log(myhashv)
     if(hash==myhashv){
-        var multiplier = 0;
         if (data.customFields.promo!=""){
+            var multiplier = 0;
             db.query({text:'SELECT multiplier FROM public.promos WHERE promo=$1', values:[data.customFields.promo]},(err,resq)=>{
                 if(err){
                     res.sendStatus(500);
@@ -289,7 +289,7 @@ router.post('/paymentqiwiapi', (req,res)=>{
                 }
             })
         } else {
-            multiplier = 1.0;
+            var multiplier = 1.0;
         }
         let finalAmount = parseInt(parseFloat(data.amount.value)*multiplier*100);
         db.query({text:"INSERT INTO public.orders(type,price,details,customer) VALUES('payment',$1,$2,$3)",values:[finalAmount,data.billId,data.customer.account]}, (err,resq)=>{
