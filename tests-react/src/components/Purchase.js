@@ -26,7 +26,7 @@ function Purchase(props){
             }).then(r=>r.json()).then(d=>{
                 if(d.success){
                     props.setcash(props.cash-test);
-                    setLocation('/afterlife');
+                    window.location.href = `${window.location.origin}/tests/afterlife`
                 } else {
                     sethandling(false);
                     alert('Unsucessful; try again; contact developers if necessary');

@@ -1,10 +1,10 @@
 const express = require('express');
-const router = express.Router();
 const path = require('path');
+const router = express.Router();
 
-router.use(express.static(path.join(__dirname, 'tests-react/build')));
-app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
+router.use(express.static(path.join(__dirname, '..', 'tests-react', 'build')));
+router.use('/*', (req,res)=>{
+    res.sendFile(path.join(__dirname, '..', 'tests-react', 'build', 'index.html'));
+})
 
 module.exports = router;

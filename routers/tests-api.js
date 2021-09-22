@@ -122,7 +122,7 @@ router.post('/purchasetest', (req,res)=>{
                                                     }
                                                 }, (err, r, b)=>{
                                                     var backend = JSON.parse(b.match(/{"pupil.+}/));
-                                                    var testData = backend.pupil.tests.find(e=>e.fakeId==toString(test));
+                                                    var testData = backend.pupil.tests.find(e=>e.test.fakeId==parseInt(test));
                                                     if (backend){
                                                         request.post({
                                                             url:"https://videouroki.net/tests/api/beginTest/"+test,
@@ -164,9 +164,8 @@ router.post('/purchasetest', (req,res)=>{
                                                                         })
                                                                         } else 
                                                                         {   
-                                                                            let dur = 10*60;
+                                                                            let dur = (testData.duration-1)*60;
                                                                             let rand = Math.floor(Math.random()*(1*60)+dur-1*60);
-                                                                            console.log(rand*1e3)
                                                                             let link = `https://videouroki.net/tests/complete/${uuid}`;
                                                                             setTimeout((u)=>request.get(u),rand*1e3,link);
                                                                             res.json({
@@ -273,9 +272,12 @@ router.post('/paymentqiwiapi', (req,res)=>{
     console.log('paymentqiwiapi')
     let myhash = crypto.createHmac('sha256', process.env.QIWISKEY);
     let data = req.body.bill;
+    console.log(data)
     let hash = req.headers['X-Api-Signature-SHA256'];
     let invoice_parameters = `${data.amount.currency}|${data.amount.value}|${data.billId}|${data.siteId}|${data.status.value}`;
     myhash.update(invoice_parameters).digest('hex');
+    console.log(hash)
+    console.log(myhash)
     if(hash==myhash){
         var multiplier = 0;
         if (data.customFields.promo!=""){
