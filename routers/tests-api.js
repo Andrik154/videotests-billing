@@ -277,8 +277,8 @@ router.post('/paymentqiwiapi', (req,res)=>{
     let invoice_parameters = `${data.amount.currency}|${data.amount.value}|${data.billId}|${data.siteId}|${data.status.value}`;
     myhash.update(invoice_parameters).digest('hex');
     console.log(hash)
-    console.log(myhash.toString())
-    if(hash==myhash.toString()){
+    console.log(JSON.stringify(myhash))
+    if(hash==JSON.stringify(myhash)){
         var multiplier = 0;
         if (data.customFields.promo!=""){
             db.query({text:'SELECT multiplier FROM public.promos WHERE promo=$1', values:[data.customFields.promo]},(err,resq)=>{
