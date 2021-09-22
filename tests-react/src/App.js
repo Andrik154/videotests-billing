@@ -1,7 +1,4 @@
-import logo from './logo.svg';
-import './App.css';
-
-import { Link, Route, Redirect, useLocation } from "wouter";
+import { Link, Route, Redirect, useLocation, Switch } from "wouter";
 import React, {useEffect, useState} from 'react';
 
 import Testlist from './components/Testlist';
@@ -11,6 +8,9 @@ import Addtest from './components/Addtest';
 import Purchase from './components/Purchase';
 import Afterlife from './components/Afterlife';
 import Payment from './components/Payment';
+import Success from "./components/Success";
+import Err404 from "./components/Err404";
+import Index from "./components/Index";
 
 function App() {
   const [location, setLocation] = useLocation();
@@ -73,9 +73,9 @@ function App() {
     return (
       <div>
         <header className="mt-2 border-bottom">
-          <div className="col-12 col-md-10 col-lg-8 d-flex align-items-center mx-auto px-2">
-            <Link href="/"><h4 id="logo">TestiKupitOnlain</h4></Link>
-            <Link href="/usertests" style={{marginLeft:"30px"}}>Доступные тесты</Link>
+          <div className="col-12 col-md-10 col-lg-8 d-flex mx-auto align-items-center px-2" id="navitems">
+            <Link href="/"><h4 id="logo">TestiKupit</h4></Link>
+            <Link href="/usertests" style={{marginLeft:"30px"}}>Тесты</Link>
             <Link href="/pay" style={{marginLeft:"30px"}}>Пополнить</Link>
             <div style={{"marginLeft":"auto"}}>
                   {user?<span id="acc">{additionalData.pupil.firstname} {cash/100>>0}.{cash%100} RUR<span style={{marginLeft:"8px"}}>(<a href="#" onClick={(e)=>{e.preventDefault();localStorage.removeItem('user'); setLocation('/signin'); setuser(null);}}>Выйти</a>)</span></span>:<Link href="/signin">Войти</Link>}
@@ -84,6 +84,8 @@ function App() {
         </header> 
         <main>
           <div className="col-12 col-md-10 col-lg-8 mx-auto px-2">
+            <Switch>
+              <Route path="/" component={Index}/>
               <Route path="/testlist" component={Testlist} />
               <Route path="/usertests" component={()=> <Usertest user={user} additionalData={additionalData}/>} />
               <Route path="/addtest" component={Addtest}/>
@@ -92,6 +94,9 @@ function App() {
               <Route path="/signin" component={()=> <Signin setuser={setuser} setAdditionalData={setAdditionalData}/>} />
               <Route path="/afterlife" component={Afterlife} />
               <Route path="/pay" component={()=><Payment user={user} />} />
+              <Route path="/success" component={Success} />
+              <Route path="" component={Err404} />
+            </Switch>
           </div>
         </main>
         <footer className="border-top bg-light">

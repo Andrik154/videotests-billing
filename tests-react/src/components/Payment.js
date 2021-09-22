@@ -1,4 +1,6 @@
-import { useState,useRef } from "react"
+import { useState, useRef } from "react"
+import { useLocation, Redirect } from "wouter";
+
 const errorsList = {
     "nan":{
         text:"Введённая сумма должна быть числом!",
@@ -11,6 +13,8 @@ const errorsList = {
     }
 }
 function Payment(props){
+    const [location, setLocation] = useLocation();
+    const [show, setshow] = useState(props.user&&true);
     const handlePayment = (e)=>{
         e.preventDefault();
         const dateHandler = (d)=>`${d.getFullYear()}-${d.getMonth()<10?`0${d.getMonth()}`:d.getMonth()}-${d.getDate()<10?`0${d.getDate()}`:d.getDate()}Т${d.getHours()<10?`0${d.getHours()}`:d.getHours()}${d.getMinutes()<10?`0${d.getMinutes()}`:d.getMinutes()}`
@@ -23,7 +27,7 @@ function Payment(props){
                 themeCode: "Andrei-LLlD4scgVW"
             },
             lifetime: `${dateHandler(new Date(Date.now()+25*60e3))}`,
-            successUrl: `${window.location.origin}/success?amount=${ui.toFixed(2)}`
+            successUrl: `${window.location.origin}/tests/success?amount=${ui.toFixed(2)}`
         }
         const {customFields, ...restP} = payload;
         const qsp = new URLSearchParams({...restP});
@@ -134,6 +138,9 @@ function Payment(props){
     const form = useRef(null);
     var [errors, setErrors]  = useState([]);
 
+    if(!show){
+        return <Redirect to="/signin"/>
+    }
     return (
         <div className="col-12 col-md-5 mx-auto mt-5 border">  
             <div className="border-bottom mb-1 px-3 pt-2 bg-light">

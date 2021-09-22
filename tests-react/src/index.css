@@ -32,3 +32,13 @@ footer{
   width:30vw;
   height:100vh;
 }
+
+@media screen and (max-width:600px) {
+  #navitems{
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+  #navitems *{
+    margin-left: 0 !important;
+  }
+}

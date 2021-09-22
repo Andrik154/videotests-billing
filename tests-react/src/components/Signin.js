@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from "react";
+import { Redirect } from "wouter";
 import useLocation from "wouter/use-location";
 
 function Signin(props){
@@ -6,6 +7,7 @@ function Signin(props){
     const [nosuccess, setnosuccess] = useState(false);
     const [savedcreds, setsavedcreds] = useState(JSON.parse(localStorage.getItem('credentials')));
     const [location, setLocation] = useLocation();
+    const [loggedin, setLoggedin] = useState(false);
 
     function signin(e){
         e.preventDefault();
@@ -48,11 +50,11 @@ function Signin(props){
                             savedcreds?localStorage.setItem('credentials',JSON.stringify([login, pass])):localStorage.setItem('credentials',JSON.stringify([login, pass]));
                             setsavedcreds(JSON.parse(localStorage.getItem('credentials')));
                         }
+                        setLoggedin(true);
                         props.setAdditionalData(Object.assign(d.backend));
                         localStorage.setItem('user',JSON.stringify(storageData));
                         props.setuser(storageData);
                         settoggleblock(false);
-                        setLocation('/');
                     } else {
                         setnosuccess(true);
                         settoggleblock(false); 
@@ -68,6 +70,7 @@ function Signin(props){
     
     return(
         <div className="col-12 col-md-5 rounded mx-auto mt-5 border rounded-0">
+            {loggedin&&<Redirect to="/" />}
             <div className="border-bottom mb-1 px-3 pt-2 bg-light">
                 <h5>Вход</h5>
             </div>
