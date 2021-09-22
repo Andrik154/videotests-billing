@@ -292,7 +292,11 @@ router.post('/paymentqiwiapi', (req,res)=>{
             multiplier = 1.0;
         }
         let finalAmount = parseInt(parseFloat(data.amount.value)*multiplier*100);
-        db.query({text:"INSERT INTO public.orders(type,price,details,customer) VALUES('payment',$1,$2,$3)",values:[finalAmount,data.billId,data.customer.account]});
+        db.query({text:"INSERT INTO public.orders(type,price,details,customer) VALUES('payment',$1,$2,$3)",values:[finalAmount,data.billId,data.customer.account]}, (err,resq)=>{
+            if(err){
+                console.log(`${err}, ${data}`)
+            }
+        });
         db.query({text:'UPDATE public.users SET cash = cash + $1 WHERE login=$2', values:[finalAmount, data.customer.account]}, (err,resq)=>{
             if(err){
                 res.sendStatus(500);
