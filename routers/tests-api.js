@@ -280,7 +280,7 @@ router.post('/paymentqiwiapi', (req,res)=>{
     console.log(myhashv)
     if(hash==myhashv){
         new Promise((resolve,reject)=>{
-            if (data.customFields.promo!=""){
+            if (data.customFields.promo!=undefined){
                 var multiplier = 1.0;
                 db.query({text:'SELECT multiplier FROM public.promos WHERE promo=$1', values:[data.customFields.promo]},(err,resq)=>{
                     if(err){
