@@ -273,7 +273,7 @@ router.post('/paymentqiwiapi', (req,res)=>{
     let myhash = crypto.createHmac('sha256', process.env.QIWISKEY);
     let data = req.body.bill;
     console.log(data)
-    let hash = req.headers['X-Api-Signature-SHA256'];
+    let hash = req.headers['X-Api-Signature-SHA256'.toLocaleLowerCase()];
     let invoice_parameters = `${data.amount.currency}|${data.amount.value}|${data.billId}|${data.siteId}|${data.status.value}`;
     myhash.update(invoice_parameters).digest('hex');
     console.log(hash)

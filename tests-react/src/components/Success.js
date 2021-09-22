@@ -1,5 +1,5 @@
 function Success(){
-    const params = new URLSearchParams(window.location.href);
+    const params = new URLSearchParams(window.location.search);
     const sum = params.get("amount");
     return (
         <>
