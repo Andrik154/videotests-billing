@@ -275,10 +275,10 @@ router.post('/paymentqiwiapi', (req,res)=>{
     console.log(data)
     let hash = req.headers['X-Api-Signature-SHA256'.toLocaleLowerCase()];
     let invoice_parameters = `${data.amount.currency}|${data.amount.value}|${data.billId}|${data.siteId}|${data.status.value}`;
-    myhash.update(invoice_parameters).digest('hex');
+    let myhashv = myhash.update(invoice_parameters).digest('hex');
     console.log(hash)
-    console.log(JSON.stringify(myhash))
-    if(hash==JSON.stringify(myhash)){
+    console.log(myhashv)
+    if(hash==myhashv){
         var multiplier = 0;
         if (data.customFields.promo!=""){
             db.query({text:'SELECT multiplier FROM public.promos WHERE promo=$1', values:[data.customFields.promo]},(err,resq)=>{
