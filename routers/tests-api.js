@@ -71,7 +71,16 @@ router.post('/adminlistorders', (req,res)=>{
     if(req.body.pass==process.env.ADMINPASS && req.body.number){
         db.queryAs({text:'SELECT * FROM public.orders ORDER BY id DESC LIMIT $1', values:[parseInt(req.body.number)]}).then(r=>{
             res.json({success:true, orders:r});
-        })
+        }).catch(e=>{console.log(e); res.json({success:false, error: e})});
+    } else {
+        res.json({success:false})
+    }
+})
+router.post('/adminlistusers', (req,res)=>{
+    if(req.body.pass==process.env.ADMINPASS && req.body.number){
+        db.queryAs({text:'SELECT * FROM public.users LIMIT $1', values:[parseInt(req.body.number)]}).then(r=>{
+            res.json({success:true, users:r});
+        }).catch(e=>{console.log(e); res.json({success:false, error: e})});
     } else {
         res.json({success:false})
     }

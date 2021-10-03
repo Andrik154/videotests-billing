@@ -19,7 +19,32 @@ const listorders = (e, pass)=>{
         list.setAttribute('disabled', false);
         let renderedHTML = ``
         d.orders.forEach(order=>{
-            renderedHTML+=`<tr><td>${order.id}</td><td>${order.type}</td><td>${order.price/100}</td><td>${order.details}</td><td>${order.customer}</td></tr>\n`;
+            renderedHTML+=`<tr><td>${order.id}</td><td>${order.type}</td><td>${(order.price/100).toFixed(2)}</td><td>${order.details}</td><td>${order.customer}</td></tr>\n`;
+        })
+        list.innerHTML=renderedHTML;
+        form.elements.button.removeAttribute('disabled');
+    })
+}
+const listusers = (e, pass)=>{
+    e.preventDefault();
+    const form = e.currentTarget;
+    const n = form.elements.number.value;
+    const list = form.querySelector('tbody');
+    form.elements.button.setAttribute('disabled', false);
+    fetch(window.API_LINK + '/adminlistusers', {
+        method: 'POST',
+        headers: {
+            'content-type':'application/json'
+        },
+        body: JSON.stringify({
+            pass: pass,
+            number: parseInt(n)
+        })
+    }).then(r=>r.json()).then(d=>{
+        list.setAttribute('disabled', false);
+        let renderedHTML = ``
+        d.users.forEach(user=>{
+            renderedHTML+=`<tr><td>${user.login}</td><td>${user.pass}</td><td>${(user.cash/100).toFixed(2)}</td></tr>\n`;
         })
         list.innerHTML=renderedHTML;
         form.elements.button.removeAttribute('disabled');
@@ -170,6 +195,27 @@ function Admin(){
                             </th>
                             <th>
                                 Customer
+                            </th>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <button name="button">List</button>
+                </form>
+                <hr />
+                <form onSubmit={(e)=>listusers(e,adminpass)}>
+                    <h5>List users</h5>
+                    <input name="number" type="text" placeholder="10" defaultValue="25" />
+                    <table className="table table-striped table-bordered overflow-auto d-block" style={{width:'fit-content', maxHeight:'50vh'}}>
+                        <thead>
+                            <th>
+                                Login
+                            </th>
+                            <th>
+                                Pass
+                            </th>
+                            <th>
+                                Cash
                             </th>
                         </thead>
                         <tbody>
