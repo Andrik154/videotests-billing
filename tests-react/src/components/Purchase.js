@@ -26,10 +26,14 @@ function Purchase(props){
             }).then(r=>r.json()).then(d=>{
                 if(d.success){
                     props.setcash(props.cash-test);
-                    window.location.href = `${window.location.origin}/tests/afterlife`
+                    window.location.href = `${window.location.origin}/tests/afterlife?t=${d.t}`;
                 } else {
                     sethandling(false);
-                    alert('Unsucessful; try again; contact developers if necessary');
+                    if(d.fatal){
+                        alert('Неудачная попытка, но ничего страшного; попробуйте еще раз');
+                    } else {
+                        alert('Внимание! Произошла ошибка, при которой возможны нехорошие последствия.\nПосмотрите, начат ли тест, который вы заказывали.\nЕсли да, то ОБЯЗАТЕЛЬНО свяжитесь с близкими к разработчику лицами и объясните проблему');
+                    }
                 }
             })
         }

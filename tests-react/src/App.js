@@ -93,7 +93,7 @@ function App() {
               <Route path="/purchase/:id">{(p)=>{return (<Purchase id={p.id} user={user} additionalData={additionalData} cash={cash} setcash={setcash}/>)}}</Route>
               <Route path="/signin" component={()=> <Signin setuser={setuser} setAdditionalData={setAdditionalData}/>} />
               <Route path="/afterlife" component={Afterlife} />
-              <Route path="/pay" component={()=><Payment user={user} />} />
+              <Route path="/pay" component={()=><Payment user={user} additionalData={additionalData} />} />
               <Route path="/success" component={Success} />
               <Route path="" component={Err404} />
             </Switch>

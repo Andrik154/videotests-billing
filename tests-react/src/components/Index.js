@@ -12,9 +12,8 @@ function Index(){
                 <button className="btn btn-outline-light border rounded-10 ms-2">
                     <Link href="/usertests" style={{textDecoration:"none", color:"gray"}}>Тесты на аккаунте</Link>
                 </button>
-
             </div>
-
+            <img src = "./xd.jpg"  width="300" className="mt-2" />
         </div>
     )
 }

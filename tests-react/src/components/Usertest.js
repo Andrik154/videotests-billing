@@ -7,7 +7,7 @@ function Usertest(props){
 
     if(show){
         return(
-            <div style={{height:"80vh"}}>
+            <div style={{height:"70vh"}}>
                 <div className="col-12 overflow-auto mt-2" style={{maxHeight:"100%"}}>
                 {props.additionalData.pupil.tests.map((item)=>{
                             console.log(item)

@@ -27,6 +27,7 @@ function Payment(props){
                 themeCode: "Andrei-LLlD4scgVW"
             },
             lifetime: `${dateHandler(new Date(Date.now()+25*60e3))}`,
+            comment: `${props.additionalData.pupil.firstname} ${props.additionalData.pupil.lastname} ${checkedPromo.text} - ${checkedPromo.multiplier}`,
             successUrl: `${window.location.origin}/tests/success?amount=${(ui*checkedPromo.multiplier).toFixed(2)}`
         }
         const {customFields, ...restP} = payload;
