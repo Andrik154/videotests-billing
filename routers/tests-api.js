@@ -40,6 +40,33 @@ router.post('/adminauth', (req,res)=>{
         res.json({success: false});
     }
 })
+router.post('/adminlistpromos', (req,res)=>{
+    if(req.body.pass==process.env.ADMINPASS){
+        db.queryAs({text:'SELECT * FROM public.promos ORDER BY multiplier DESC'}).then(r=>{
+            res.json({success:true, promos:r});
+        })
+    } else {
+        res.json({success:false})
+    }
+})
+router.post('/adminaddpromo', (req,res)=>{
+    if(req.body.pass==process.env.ADMINPASS && req.body.promo && req.body.multiplier){
+        db.queryAs({text:'INSERT INTO public.promos(promo, multiplier) VALUES($1, $2)', values:[req.body.promo, parseFloat(req.body.multiplier)]}).then(r=>{
+            res.json({success:true});
+        }).catch(e=>{console.log(e); res.json({success:false, error: e})});
+    } else {
+        res.json({success:false})
+    }
+})
+router.post('/adminremovepromo', (req,res)=>{
+    if(req.body.pass==process.env.ADMINPASS && req.body.promo){
+        db.queryAs({text:'DELETE FROM public.promos WHERE promo=$1', values:[req.body.promo]}).then(r=>{
+            res.json({success:true});
+        }).catch(e=>{console.log(e); res.json({success:false, error: e})});
+    } else {
+        res.json({success:false})
+    }
+})
 router.post('/addtest', (req,res)=>{
     if (req.body.pass != process.env.PASS){
         res.json({
