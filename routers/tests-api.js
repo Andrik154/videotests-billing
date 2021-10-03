@@ -33,6 +33,13 @@ var handling = [];
 
 })()
 
+router.post('/adminauth', (req,res)=>{
+    if(req.body.pass==process.env.ADMINPASS){
+        res.json({success:true});
+    } else {
+        res.json({success: false});
+    }
+})
 router.post('/addtest', (req,res)=>{
     if (req.body.pass != process.env.PASS){
         res.json({

@@ -11,6 +11,7 @@ import Payment from './components/Payment';
 import Success from "./components/Success";
 import Err404 from "./components/Err404";
 import Index from "./components/Index";
+import Admin from "./components/Admin";
 
 function App() {
   const [location, setLocation] = useLocation();
@@ -95,6 +96,7 @@ function App() {
               <Route path="/afterlife" component={Afterlife} />
               <Route path="/pay" component={()=><Payment user={user} additionalData={additionalData} />} />
               <Route path="/success" component={Success} />
+              <Route path="/admin" component={Admin} />
               <Route path="" component={Err404} />
             </Switch>
           </div>
