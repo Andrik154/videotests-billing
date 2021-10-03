@@ -90,6 +90,7 @@ function Admin(){
         return (
             <>
                 not authorized
+                {localStorage.removeItem('adminpass')}
             </>
         )
     } else {
