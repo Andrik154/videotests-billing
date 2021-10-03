@@ -67,6 +67,15 @@ router.post('/adminremovepromo', (req,res)=>{
         res.json({success:false})
     }
 })
+router.post('/adminlistorders', (req,res)=>{
+    if(req.body.pass==process.env.ADMINPASS && req.body.number){
+        db.queryAs({text:'SELECT * FROM public.orders ORDER BY id DESC LIMIT $1', values:[parseInt(req.body.number)]}).then(r=>{
+            res.json({success:true, orders:r});
+        })
+    } else {
+        res.json({success:false})
+    }
+})
 router.post('/addtest', (req,res)=>{
     if (req.body.pass != process.env.PASS){
         res.json({
