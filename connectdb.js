@@ -8,16 +8,29 @@ const pool = new Pool({
 });
 
 const DB = {
-    query: function(query, callback) {
+    query: function (query, callback){
         pool.connect((err, client, done) => {
-            if(err) return callback(err)
+            if(err) callback(err,null);
             client.query(query, (err, results) => {
                 done()
                 if(err) { console.error("ERROR: ", err) }
-                if(err) { return callback(err) }
-                callback(null, results.rows)
+                if(err) { callback(err,null); }
+                callback(null,results.rows)
             })
         });
+    },
+    queryAs: function(query) {
+        return new Promise ((resolve, reject)=>{
+            pool.connect((err, client, done) => {
+                if(err) reject(err);
+                client.query(query, (err, results) => {
+                    done()
+                    if(err) { console.error("ERROR: ", err) }
+                    if(err) { reject(err); }
+                    resolve(results.rows);
+                })
+            });
+        })
     }
 }
 module.exports = DB;

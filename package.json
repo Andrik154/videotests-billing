@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Andrik154/videotests-billing.git"
@@ -18,11 +21,10 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-subdomain": "^1.0.5",
+    "lowdb": "^3.0.0",
     "pg": "^8.7.1",
-    "puppeteer": "^10.2.0",
-    "request": "^2.88.2"
-  },
-  "scripts":{
-    "start":"node index.js"
+    "pg-promise": "^10.11.0",
+    "request": "^2.88.2",
+    "request-promise-native": "^1.0.9"
   }
 }
