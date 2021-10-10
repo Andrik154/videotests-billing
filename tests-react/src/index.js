@@ -4,7 +4,7 @@ import { Router } from 'wouter';
 import './index.css';
 import App from './App';
 
-window.API_LINK = 'https://toolstools.herokuapp.com/tests/api';
+window.API_LINK = 'http://localhost/tests/api';
 
 ReactDOM.render(
   <React.StrictMode>

@@ -177,7 +177,7 @@ router.post('/purchasetest', (req,res)=>{
         })
         .then(r=>{
             const ans = JSON.parse(r[1][0].answers);
-            const {testData, id, uuid} = r[2];
+            const {testData, id, uuid} = r[3];
             const dur = (testData.duration-1.3)*60;
             const t = Math.floor(Math.random()*(1*60)+dur-1*60);
             const parray = [{uuid, t}];
