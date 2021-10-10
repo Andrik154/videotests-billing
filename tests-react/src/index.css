@@ -23,7 +23,7 @@ p{
   cursor:pointer;
 }
 footer{
-  position:relative;
+  position:absolute;
   margin-top:10px;
   left:0;
   bottom:0;
