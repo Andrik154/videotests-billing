@@ -1,0 +1,62 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+#root{
+  position:relative;
+  padding-bottom:2.5rem;
+  min-height: 100vh;
+}
+
+footer{
+  position:absolute;
+  bottom:0;
+  height:2.5rem;
+  width:100%;
+}
+
+button.btn-link{
+  border: none;
+  background-color: transparent;
+}
+
+@media (min-width: 0px) {
+  .foodcard{
+    width: 100%;
+  }
+}
+@media (min-width: 576px) {
+  .foodcard{
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .foodcard{
+    width:48%;
+  }
+}
+
+@media (min-width: 992px) {
+  .foodcard{
+    width:23%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .foodcard{
+    width:23%;
+  }
+}
+
+@media (min-width: 1400px) {}

@@ -4,12 +4,14 @@ const router = express.Router();
 const path = require("path");
 
 const tests = require('./tests-main');
+const kfc = require('./kfc');
 
 router.get('/robots.txt', (req,res)=>{
     res.type('text/plain')
     res.sendFile(path.join(__dirname, '..', 'robots.txt'));
 })
 router.use('/tests', tests);
+router.use('/kfc', kfc)
 
 router.use('/', (req,res)=>{
     res.status(404).send('Error 404 ;)');

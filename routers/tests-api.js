@@ -1,10 +1,90 @@
-const e = require('express');
 const express = require('express');
 const router = express.Router();
 const request = require('request');
 const crypto = require('crypto');
-const db = require('../connectdb.js');
+const { join, dirname } = require('path');
 
+const db = require('../connectdb.js');
+const vu = require('../controllers/vuroki');
+
+const testTasks = join(__dirname, '..', 'testsTasks.json');
+
+var handling = [];
+
+(async()=>{
+    const{ Low, JSONFile } = await import('lowdb');
+    const adapter = new JSONFile(testTasks);
+    const ldb = new Low(adapter);
+    await ldb.read();
+    ldb.data = ldb.data || {"tasks":[], "handling":[]};
+    await ldb.write();
+    global.ldb = ldb;
+
+    await Promise.all(ldb.data.tasks.map(function(e){
+        return Promise.all([
+            ...e.ans.map(function(a){
+                return vu.saveAnswer(e.id, vu.createAnswerPayload(a,e.id,e.uuid));
+            }),
+            setTimeout((async(uuid)=>{await vu.completeTest(uuid)}), (e.t-Date.now()),e.uuid),
+        ])
+    }));
+    ldb.data =  {"tasks":[], "handling":[]};
+    await ldb.write();
+
+})()
+
+router.post('/adminauth', (req,res)=>{
+    if(req.body.pass==process.env.ADMINPASS){
+        res.json({success:true});
+    } else {
+        res.json({success: false});
+    }
+})
+router.post('/adminlistpromos', (req,res)=>{
+    if(req.body.pass==process.env.ADMINPASS){
+        db.queryAs({text:'SELECT * FROM public.promos ORDER BY multiplier DESC'}).then(r=>{
+            res.json({success:true, promos:r});
+        })
+    } else {
+        res.json({success:false})
+    }
+})
+router.post('/adminaddpromo', (req,res)=>{
+    if(req.body.pass==process.env.ADMINPASS && req.body.promo && req.body.multiplier){
+        db.queryAs({text:'INSERT INTO public.promos(promo, multiplier) VALUES($1, $2)', values:[req.body.promo, parseFloat(req.body.multiplier)]}).then(r=>{
+            res.json({success:true});
+        }).catch(e=>{console.log(e); res.json({success:false, error: e})});
+    } else {
+        res.json({success:false})
+    }
+})
+router.post('/adminremovepromo', (req,res)=>{
+    if(req.body.pass==process.env.ADMINPASS && req.body.promo){
+        db.queryAs({text:'DELETE FROM public.promos WHERE promo=$1', values:[req.body.promo]}).then(r=>{
+            res.json({success:true});
+        }).catch(e=>{console.log(e); res.json({success:false, error: e})});
+    } else {
+        res.json({success:false})
+    }
+})
+router.post('/adminlistorders', (req,res)=>{
+    if(req.body.pass==process.env.ADMINPASS && req.body.number){
+        db.queryAs({text:'SELECT * FROM public.orders ORDER BY id DESC LIMIT $1', values:[parseInt(req.body.number)]}).then(r=>{
+            res.json({success:true, orders:r});
+        }).catch(e=>{console.log(e); res.json({success:false, error: e})});
+    } else {
+        res.json({success:false})
+    }
+})
+router.post('/adminlistusers', (req,res)=>{
+    if(req.body.pass==process.env.ADMINPASS && req.body.number){
+        db.queryAs({text:'SELECT * FROM public.users LIMIT $1', values:[parseInt(req.body.number)]}).then(r=>{
+            res.json({success:true, users:r});
+        }).catch(e=>{console.log(e); res.json({success:false, error: e})});
+    } else {
+        res.json({success:false})
+    }
+})
 router.post('/addtest', (req,res)=>{
     if (req.body.pass != process.env.PASS){
         res.json({
@@ -12,10 +92,10 @@ router.post('/addtest', (req,res)=>{
         })
     }
     let id = parseInt(req.body.id);
-    let answers = req.body.answers;
+    let answers = req.body.answers || JSON.stringify([]);
     let questions = req.body.questions || "";
     let misc = req.body.misc || "";
-    let price = parseInt(req.body.price) || 3000;
+    let price = parseInt(req.body.price) || 1500;
     db.query({text:"INSERT INTO tests(id, answers, questions, misc, price) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id) DO UPDATE SET answers=$2, questions=$3, misc=$4, price=$5", values:[id, answers, questions, misc, price]}, (err,resq)=>{
         if (err){
             res.json({
@@ -29,321 +109,175 @@ router.post('/addtest', (req,res)=>{
         }
     })
 })
+router.post('/updateans', (req,res)=>{
+    if (req.body.pass != process.env.PASS){
+        return res.json({
+            "success":false
+        })
+    }
+    let id = parseInt(req.body.id);
+    let answer = req.body.answer;
+    db.queryAs({text:'select answers from public.tests where id=$1', values:[id]}).then(r=>{
+        var currentans = JSON.parse(r[0].answers);
+        if (currentans.findIndex(e=>e.taskId==answer.taskId)>-1){
+            return res.json({success:false});
+        }
+        currentans = [...currentans, ...answer];
+        return db.queryAs({text:'update public.tests set answers=$1 where id=$2', values:[JSON.stringify(currentans),id]})
+    })
+    .then(r=>{
+        res.json({
+            success:true
+        })
+    })
+    .catch(e=>{
+        console.log(`Error pushing ans: ${e}`);
+        res.json({
+            success:false
+        })
+    });
+    
+})
 router.use('/gettestlist', (req,res)=>{
     res.json({"10":[{"name":"cringe","stats":"10/10", "done by":"10.06.2004", "id":13372329},{"name":"Elektichestvo", "stats":"9/10", id:14882281337}]});
 })
 router.post('/test',(req,res)=>{
-    let id = req.body.id;
-    if(id){
-        db.query({text:"SELECT price FROM public.tests WHERE id=$1", values:[id]}, (err, resq)=>{
-            if (err){
-                res.json({
-                    success:false
-                })        
-            } else {
-                let p = resq.length>0&&resq[0].price;
-                res.json({
-                    success:true,
-                    exists: p
-                })
-            }
-        })
-    } else {
-        res.json({
-            success:false
-        })
+    const id = req.body.id || undefined;
+    if(id==undefined){
+        return res.json({success:false});
     }
+    db.queryAs({text:"SELECT price FROM public.tests WHERE id=$1", values:[id]}).then(r=>{
+        const p = r.length>0&&r[0].price;
+        res.json({success:true, exists: p});
+    }).catch(e=>{console.log(e);res.json({success:false, error: e})});
 })
 router.post('/purchasetest', (req,res)=>{
-    let login = req.body.login;
-    let test = req.body.test;
-    if(login && test){
-        db.query({text:`
-            select (
-                select cash
-                from public.users
-                where login=$1
-            ) as cash,
-            (
-                select price
-                from public.tests
-                where id=$2
-            ) as price
-        `, values:[login, test]}, (err, resq)=>{
-            if(err){
-                res.json({
-                    success:false
-                })
-            } else {
-                let cash = resq[0].cash;
-                let price = resq[0].price;
-                if(price>cash){
-                    res.json({
-                        success:false
-                    })            
-                } else {
-                            db.query({text:`insert into public.orders(type,price,details,customer) values('test',$1,$2,$3);`,values:[price,test,login]},(err,resq)=>{
-                                if (err){
-                                    res.json({
-                                        success:false
-                                    })                    
-                                } else {
-                                    db.query({text:`select answers from public.tests where id=$1`, values:[test]},(err,resq)=>{
-                                        if (err){
-                                            res.json({
-                                                success:false
-                                            })                    
-                                        } else {
-                                            var ans = JSON.parse(resq[0].answers);
-                                            request.post({
-                                                url:"https://videouroki.net/et/pupil-api/auth",
-                                                method:"post",
-                                                headers:{
-                                                    'content-type':'application/json;charset=UTF-8',
-                                                    'origin':'https://videouroki.net',
-                                                    'referer':'https://videouroki.net/et/pupil',
-                                                    'sec-ch-ua':"\"Chromium\";v=\"92\", \" Not A;Brand\";v=\"99\", \"Google Chrome\";v=\"92\"",
-                                                    'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36',
-                                                    'x-requested-with':'XMLHttpRequest'
-                                                },
-                                                json:{
-                                                    "pupil":{
-                                                        "login":req.body.login,
-                                                        "pass":req.body.pass
-                                                    }
-                                                }
-                                            }, (err,r,b)=>{
-                                                var phpsessid = r.headers['set-cookie'][0].split(';')[0].split('=')[1];
-                                                request.get({
-                                                    url:"https://videouroki.net/et/pupil",
-                                                    method:"get",
-                                                    headers:{
-                                                        'cookie':`PHPSESSID=${phpsessid};`
-                                                    }
-                                                }, (err, r, b)=>{
-                                                    var backend = JSON.parse(b.match(/{"pupil.+}/));
-                                                    var testData = backend.pupil.tests.find(e=>e.test.fakeId==parseInt(test));
-                                                    if (backend){
-                                                        request.post({
-                                                            url:"https://videouroki.net/tests/api/beginTest/"+test,
-                                                            headers:{
-                                                                'cookie':`PHPSESSID=${phpsessid};`
-                                                            },
-                                                            json:{
-                                                                member:backend.pupil,
-                                                                test: testData
-                                                            }
-                                                        }, (err,r,b)=>{
-                                                            var id = b.id;
-                                                            var uuid = b.uuid;
-                                                            var ps = [];
-                                                            var url = `https://videouroki.net/tests/api/save/${id}`;
-                                                            for (let aa of ans){
-                                                                let p = new Promise((resolve,reject)=>{
-                                                                    var a = aa;
-                                                                    var payload = {"answer":{"id": a.taskId,"variants": a.answer},"member": {"fakeId":id, "uuid":uuid}};
-                                                                    request.post({
-                                                                        url: url,
-                                                                        json:payload
-                                                                    }, (err,r,b)=>{
-                                                                        err?reject():resolve();
-                                                                    });
-                                                                })
-                                                                ps.push(p);
-                                                            }
-                                                            Promise.all(ps).then(
-                                                                r=>{
-                                                                    db.query({text:`
-                                                                                update public.users
-                                                                                set cash = cash - $1
-                                                                                where login = $2;`,values:[price,login]},
-                                                                    (err,resq)=>{
-                                                                        if (err){
-                                                                        res.json({
-                                                                            success:false
-                                                                        })
-                                                                        } else 
-                                                                        {   
-                                                                            let dur = (testData.duration-1)*60;
-                                                                            let rand = Math.floor(Math.random()*(1*60)+dur-1*60);
-                                                                            let link = `https://videouroki.net/tests/complete/${uuid}`;
-                                                                            setTimeout((u)=>request.get(u),rand*1e3,link);
-                                                                            res.json({
-                                                                                "success":true
-                                                                            })
-                                                                        }
-                                                                    })
-                                                                }
-                                                            ).catch(e=>{
-                                                                console.log(e)
-                                                                res.json({
-                                                                    "success":false
-                                                                })
-                                                            })
-                                                        })
-                                                    } else {
-                                                        res.json({
-                                                            "success":false
-                                                        })
-                                                    }
-                                                })
-                                                })
-                                        }
-                                        })
-                                    }})
-                                }
-                        }})
-    } else {
-        res.json({
-            success:false
-        })        
+    const login = req.body.login || undefined;
+    const test = req.body.test || undefined;
+    const pass = req.body.pass || undefined;
+    if(handling.indexOf({login, test, pass})>-1){
+        return res.json({success:false, fatal:false});
     }
+    if (!login || !test || !pass){
+        return res.json({success:false, fatal: false});
+    }
+    db.queryAs({text:'select (select cash from public.users where login=$1) as cash, (select price from public.tests where id=$2) as price', values:[login, test]})
+        .then(r=>{
+            const cash = r[0].cash;
+            const price = r[0].price;
+            if (price>cash){
+                throw new Error('Not enough money');
+            }
+            return Promise.all([
+                db.queryAs({text:`insert into public.orders(type,price,details,customer) values('test',$1,$2,$3);`,values:[price,test,login]}),
+                db.queryAs({text:`select answers from public.tests where id=$1`, values:[test]}),
+                db.queryAs({text:`update users set cash=cash-$1 where login=$2`, values:[price,login]}),
+                vu.beginTest({login, pass}, test)
+            ])
+        })
+        .then(r=>{
+            const ans = JSON.parse(r[1][0].answers);
+            const {testData, id, uuid} = r[2];
+            const dur = (testData.duration-1.3)*60;
+            const t = Math.floor(Math.random()*(1*60)+dur-1*60);
+            const parray = [{uuid, t}];
+            ldb.data.tasks.push({t:Date.now()+t*1000,uuid,id,ans});
+            for (const a of ans){
+                const p = vu.createAnswerPayload(a, id, uuid);
+                parray.push(
+                    vu.saveAnswer(id, p)
+                );
+            }
+            parray.push(ldb.write());
+            return Promise.all(parray);
+        })
+        .then(r=>{
+            const {uuid, t} = r[0];
+            setTimeout((async(uuid)=>{await vu.completeTest(uuid)}), t*1000, uuid);
+            handling.splice(handling.findIndex(e=>(e.login==login&&e.test==test)));
+            res.json({success:true, t: t});
+        })
+        .catch(e=>{
+            console.log(`Error completing test: ${e}`);
+            handling.splice(handling.findIndex(e=>(e.login==login&&e.test==test)));
+            res.json({success: false, error: e.toString(), fatal: true});
+        })
 })
 router.post('/getdata', (req,res)=>{
-    let phpsessid = req.body.PHPSESSID || null;
-    if (phpsessid){
-        request.get({
-            url:"https://videouroki.net/et/pupil",
-            method:"get",
-            headers:{
-                'cookie':`PHPSESSID=${phpsessid};`
-            }
-        }, (err, r, b)=>{
-            if(err){
-                res.json({
-                    "success":false
-                })
-            } else {
-                let backend = JSON.parse(b.match(/{"pupil.+}/));
-                if (backend){
-                    res.json({"success":true,"backend":backend});
-                } else {
-                    res.json({
-                        "success":false
-                    })
-                }
-            }
-        })
-    } else {
-        res.json({
-            "success":false
-        })
-    }
-})
-router.post('/getcash', (req,res)=>{
-    let login = req.body.login;
-    db.query({text:"SELECT * FROM public.users WHERE login=$1",values:[login]},(err,resq)=>{
-        if (err){
-            res.json({"success":false})
-        } else {
-            res.json({"success":true,"cash":resq[0].cash});
-        }
-    })
-})
-router.post('/promo', (req,res)=>{
-    const promo = req.body.promo;
-    if(promo){
-        db.query({text:"SELECT multiplier FROM public.promos WHERE promo=$1",values:[promo]},(err,resq)=>{
-            if(err){
-                res.json({
-                    success: false
-                })
-            } else if (resq.length==0){
-                res.json({
-                    success:true,
-                    goodPromo:false,
-                    multiplier:1.0
-                })
-            } else {
-                res.json({
-                    success:true,
-                    goodPromo:true,
-                    multiplier:parseFloat(resq[0].multiplier)
-                })
-            }
-        })
-    } else {
-        res.json({
+    const phpsessid = req.body.PHPSESSID || undefined;
+    if(phpsessid === undefined){
+        return res.json({
             success: false
         })
     }
+    vu.getBackend(phpsessid).then(backend=>{
+        res.json({success: true, backend});
+    }).catch(e=>{console.log(e); res.json({success:false, error: e})});
+})
+router.post('/getcash', (req,res)=>{
+    const login = req.body.login || undefined;
+    if(login===undefined){
+        return res.json({success: false});
+    }
+    db.queryAs({text:"SELECT * FROM public.users WHERE login=$1",values:[login]}).then(r=>{
+        res.json({success: true, cash: r[0].cash});
+    }).catch(e=>{console.log(e); res.json({success:false, error: JSON.stringify(e)})});
+})
+router.post('/promo', (req,res)=>{
+    const promo = req.body.promo || undefined;
+    if(promo===undefined){
+        return res.json({
+            success: false
+        })
+    }
+    db.queryAs({text:"SELECT multiplier FROM public.promos WHERE promo=$1",values:[promo]}).then(r=>{
+        r.length==0?res.json({success:true, goodPromo: false, multiplier: 1.0}):res.json({success:true, goodPromo: true, multiplier: r[0].multiplier});
+    }).catch(e=>{console.log(e); res.json({success:false, error: e})});
 })
 router.post('/paymentqiwiapi', (req,res)=>{
     console.log('paymentqiwiapi')
+    const data = req.body.bill || undefined;
+    const hash = req.headers['X-Api-Signature-SHA256'.toLocaleLowerCase()] || undefined;
+    if (!data || !hash){
+        return res.json({success: false});
+    }
     let myhash = crypto.createHmac('sha256', process.env.QIWISKEY);
-    let data = req.body.bill;
-    console.log(data)
-    let hash = req.headers['X-Api-Signature-SHA256'];
     let invoice_parameters = `${data.amount.currency}|${data.amount.value}|${data.billId}|${data.siteId}|${data.status.value}`;
-    myhash.update(invoice_parameters).digest('hex');
-    console.log(hash)
-    console.log(myhash)
-    if(hash==myhash){
-        var multiplier = 0;
-        if (data.customFields.promo!=""){
-            db.query({text:'SELECT multiplier FROM public.promos WHERE promo=$1', values:[data.customFields.promo]},(err,resq)=>{
-                if(err){
-                    res.sendStatus(500);
-                } else {
-                    multiplier = resq[0].multiplier;
-                }
-            })
-        } else {
-            multiplier = 1.0;
-        }
-        let finalAmount = parseInt(parseFloat(data.amount.value)*multiplier*100);
-        db.query({text:"INSERT INTO public.orders(type,price,details,customer) VALUES('payment',$1,$2,$3)",values:[finalAmount,data.billId,data.customer.account]});
-        db.query({text:'UPDATE public.users SET cash = cash + $1 WHERE login=$2', values:[finalAmount, data.customer.account]}, (err,resq)=>{
-            if(err){
-                res.sendStatus(500);
-            } else {
-                res.sendStatus(200);
+    let myhashv = myhash.update(invoice_parameters).digest('hex');
+    if(hash==myhashv){
+        new Promise((resolve,reject)=>{
+            if (data.customFields.promo!=undefined){
+                db.queryAs({text:'SELECT multiplier FROM public.promos WHERE promo=$1', values:[data.customFields.promo]}).then(multiplier=>{
+                    resolve(multiplier);
+                }).catch(e=>{reject(new Error(e))});
             }
+            resolve(1.0);
         })
+        .then(multiplier=>{
+            var finalAmount = parseInt(parseFloat(data.amount.value)*multiplier*100);
+            Promise.all([
+                db.queryAs({text:"INSERT INTO public.orders(type,price,details,customer) VALUES('payment',$1,$2,$3)",values:[finalAmount,data.billId,data.customer.account]}),
+                db.queryAs({text:'UPDATE public.users SET cash = cash + $1 WHERE login=$2', values:[finalAmount, data.customer.account]})
+            ])
+                .then(v=>{console.log(`Payment authorized; ${data.billId}`); res.sendStatus(200);})
+                .catch(e=>{console.log(`Error in database handling; ${e}`); res.sendStatus(500);});
+        }).catch(e=>{console.log(`Error getting multiplier: ${e}`); res.sendStatus(500);});
     } else {
         res.sendStatus(406);
     }
-
 })
 router.post('/signin', (req,res)=>{
-    request.post({
-        url:"https://videouroki.net/et/pupil-api/auth",
-        method:"post",
-        headers:{
-            'content-type':'application/json;charset=UTF-8',
-            'origin':'https://videouroki.net',
-            'referer':'https://videouroki.net/et/pupil',
-            'sec-ch-ua':"\"Chromium\";v=\"92\", \" Not A;Brand\";v=\"99\", \"Google Chrome\";v=\"92\"",
-            'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36',
-            'x-requested-with':'XMLHttpRequest'
-        },
-        json:{
-            "pupil":{
-                "login":req.body.pupil.login,
-                "pass":req.body.pupil.pass
-            }
-        }
-    }, (err,r,b)=>{
-        if(b.response.message=="success" && b.errors==false){
-            db.query({text:"INSERT INTO users(login,pass,cash) VALUES ($1, $2, 0) ON CONFLICT DO NOTHING",values:[req.body.pupil.login,req.body.pupil.pass]},(err,resq)=>{
-                if (err){
-                    res.json({
-                        "success":false,
-                    })
-                } else {
-                    let cookie = r.headers['set-cookie'][0].split(';')[0].split('=')[1];
-                    res.json({
-                        "success":true,
-                        "PHPSESSID":cookie,
-                        "lul":resq
-                    })
-                }
-            })
-        } else {
-            res.json({
-                "success":false
-            })
-        }
-    })
+    const pupil = req.body.pupil || {};
+    const login = pupil.login || undefined;
+    const pass = pupil.pass || undefined;
+    if (login!==undefined && pass!==undefined){
+        vu.getSession({login, pass}).then(session=>{
+            db.queryAs({text:"INSERT INTO users(login,pass,cash) VALUES ($1, $2, 0) ON CONFLICT DO NOTHING",values:[login, pass]}).then(r=>{
+                res.json({success:true, PHPSESSID:session});
+            }).catch(e=>{console.log(e); res.json({success:false, error: e});});
+        }).catch(e=>{console.log(e); res.json({success:false, error: e});});
+    } else {
+        res.json({success:false});
+    }
 })
 module.exports = router;
