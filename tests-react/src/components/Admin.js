@@ -118,23 +118,23 @@ function Admin(){
     const [allowed, setAllowed] = useState(false);
     useEffect(()=>{
         if (adminpass != undefined){
-            
+            fetch(window.API_LINK + '/adminauth', {
+                method: 'POST',
+                headers:{
+                    'content-type':'application/json'
+                },
+                body: JSON.stringify({
+                    pass: adminpass
+                })
+            }).then(r=>r.json()).then(d=>{
+                d.success?setAllowed(true):setAllowed(false);
+                !d.success&&localStorage.removeItem('adminpass');
+            }) 
         } else {
             localStorage.setItem('adminpass', prompt('adminpass?'));
             window.location.reload();
         }
-        fetch(window.API_LINK + '/adminauth', {
-            method: 'POST',
-            headers:{
-                'content-type':'application/json'
-            },
-            body: JSON.stringify({
-                pass: adminpass
-            })
-        }).then(r=>r.json()).then(d=>{
-            d.success?setAllowed(true):setAllowed(false);
-            !d.success&&localStorage.removeItem('adminpass');
-        })
+
     }, [])
     const placeholder = (e)=>{e.preventDefault()};
     if (!allowed){
