@@ -24,9 +24,8 @@ p{
 }
 footer{
   position:absolute;
-  margin-top:10px;
-  left:0;
   bottom:0;
+  height:2.5rem;
   width:100%;
 }
 #loadscreen{

@@ -250,8 +250,9 @@ router.post('/paymentqiwiapi', (req,res)=>{
                 db.queryAs({text:'SELECT multiplier FROM public.promos WHERE promo=$1', values:[data.customFields.promo]}).then(multiplier=>{
                     resolve(multiplier);
                 }).catch(e=>{reject(new Error(e))});
+            } else {
+                resolve(1.0);
             }
-            resolve(1.0);
         })
         .then(multiplier=>{
             var finalAmount = parseInt(parseFloat(data.amount.value)*multiplier*100);
