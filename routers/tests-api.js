@@ -236,6 +236,7 @@ router.post('/promo', (req,res)=>{
 })
 router.post('/paymentqiwiapi', (req,res)=>{
     console.log('paymentqiwiapi')
+    console.log(req.body);
     const data = req.body.bill || undefined;
     const hash = req.headers['X-Api-Signature-SHA256'.toLocaleLowerCase()] || undefined;
     if (!data || !hash){
@@ -247,15 +248,17 @@ router.post('/paymentqiwiapi', (req,res)=>{
     if(hash==myhashv){
         new Promise((resolve,reject)=>{
             if (data.customFields.promo!=undefined){
-                db.queryAs({text:'SELECT multiplier FROM public.promos WHERE promo=$1', values:[data.customFields.promo]}).then(multiplier=>{
-                    resolve(multiplier);
-                }).catch(e=>{reject(new Error(e))});
+                db.queryAs({text:'SELECT multiplier FROM public.promos WHERE promo=$1', values:[data.customFields.promo]}).then(r=>{
+                    resolve(r[0].multiplier);
+                }).catch(e=>{console.log('promos error');reject(new Error(e))});
             } else {
                 resolve(1.0);
             }
         })
         .then(multiplier=>{
+            console.log(multiplier);
             var finalAmount = parseInt(parseFloat(data.amount.value)*multiplier*100);
+            console.log(finalAmount);
             Promise.all([
                 db.queryAs({text:"INSERT INTO public.orders(type,price,details,customer) VALUES('payment',$1,$2,$3)",values:[finalAmount,data.billId,data.customer.account]}),
                 db.queryAs({text:'UPDATE public.users SET cash = cash + $1 WHERE login=$2', values:[finalAmount, data.customer.account]})

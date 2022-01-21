@@ -73,7 +73,7 @@ function App() {
   } else {
     return (
       <div>
-        <header className="mt-2 border-bottom">
+        {/* <header className="mt-2 border-bottom">
           <div className="col-12 col-md-10 col-lg-8 d-flex mx-auto align-items-center px-2" id="navitems">
             <Link href="/"><h4 id="logo">TestiKupit</h4></Link>
             <Link href="/usertests" style={{marginLeft:"30px"}}>Тесты</Link>
@@ -82,7 +82,21 @@ function App() {
                   {user?<span id="acc">{additionalData.pupil.firstname} {cash/100>>0}.{cash%100} RUR<span style={{marginLeft:"8px"}}>(<a href="#" onClick={(e)=>{e.preventDefault();localStorage.removeItem('user'); setLocation('/signin'); setuser(null);}}>Выйти</a>)</span></span>:<Link href="/signin">Войти</Link>}
             </div>
           </div>
-        </header> 
+        </header>  */}
+        <header className="bg-dark text-white border-bottom">
+          <div className="container-fluid col-12 col-md-10 col-lg-8">
+            <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+              <Link href="/"><h4 id="logo" className="mb-0">TestiKi</h4></Link>
+              <ul className="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 ms-4" style={{fontWeight:700}}>
+                <li><Link href="/usertests" style={{textDecoration:'none'}} className="nav-link px-2 text-white">Тесты</Link></li>
+                <li><Link href="/pay" style={{textDecoration:'none'}} className="nav-link px-2 text-white">Пополнить</Link></li>
+              </ul>
+              <div className="text-end">
+              {user?<span id="acc">{additionalData.pupil.firstname} {(cash/100).toFixed(2)} RUR<span style={{marginLeft:"8px"}}>(<a href="#" className="text-secondary" onClick={(e)=>{e.preventDefault();localStorage.removeItem('user'); setLocation('/signin'); setuser(null);}}>Выйти</a>)</span></span>:<Link href="/signin">Войти</Link>}
+              </div>
+            </div>
+          </div>
+        </header>
         <main>
           <div className="col-12 col-md-10 col-lg-8 mx-auto px-2">
             <Switch>
@@ -102,7 +116,7 @@ function App() {
           </div>
         </main>
         <footer className="border-top bg-light">
-          <div className="col-12 col-md-10 col-lg-8 mx-auto text-black py-2 px-2">
+          <div className="col-12 col-md-10 col-lg-8 mx-auto text-black py-2 px-2 pb-0">
             By <a href="https://vk.com/gluchnosti" target="_blank" className="text-black" style={{textDecoration:"underline", color:"#AAAAAA"}}>gluchnosti</a>
           </div>
         </footer>
