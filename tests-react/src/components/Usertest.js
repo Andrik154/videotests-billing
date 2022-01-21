@@ -42,7 +42,7 @@ function Usertest(props){
                                             <strong>{item.test.orderVal}. {item.test.title}</strong> <br/>
                                             <strong>Id:</strong> {item.test.fakeId} <br/>
                                             <a href={`https://videouroki.net/tests/complete/${item.lastMemberId}`} target="_blank" className='color-34'>Узнать оценку</a> <br/>
-                                            <div className="progress w-25 mt-1" style={{borderRadius:'100px'}}>
+                                            <div className="progress w-25 mt-1 responsivebtn" style={{borderRadius:'100px'}}>
                                                 <div className="progress-bar progress-33" role="progressbar" style={{width:`${item.bestPercent}%`, fontSize:"1.2em"}} aria-valuenow={item.bestPercent} aria-valuemax="100" aria-valuemin="0"  ><strong>{item.bestPercent}%</strong></div>
                                             </div>
                                             {/* <button className="btn btn-dark py-0 px-2 m-0 rounded-25 w-50 mt-1" disabled={true}>Выполнен</button> */}

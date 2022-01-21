@@ -92,7 +92,7 @@ function App() {
                 <li><Link href="/pay" style={{textDecoration:'none'}} className="nav-link px-2 text-white">Пополнить</Link></li>
               </ul>
               <div className="text-end">
-              {user?<span id="acc">{additionalData.pupil.firstname} {(cash/100).toFixed(2)} RUR<span style={{marginLeft:"8px"}}>(<a href="#" className="text-secondary" onClick={(e)=>{e.preventDefault();localStorage.removeItem('user'); setLocation('/signin'); setuser(null);}}>Выйти</a>)</span></span>:<Link href="/signin">Войти</Link>}
+              {user?<span id="acc">{additionalData.pupil.firstname} {(cash/100).toFixed(2)} RUR<span style={{marginLeft:"8px"}}>(<a href="#" className="text-secondary" onClick={(e)=>{e.preventDefault();localStorage.removeItem('user'); setLocation('/signin'); setuser(null);}}>Выйти</a>)</span></span>:<Link href="/signin" className="text-white">Войти</Link>}
               </div>
             </div>
           </div>

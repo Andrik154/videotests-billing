@@ -105,7 +105,7 @@ function Signin(props){
                     </div>
                 </div>
                 <div className="d-flex align-items-center mt-2">
-                    <button name="submit" type="submit" class="btn btn-primary" disabled={toggleblock}>Войти</button>
+                    <button name="submit" type="submit" class="btn button-34 w-25" disabled={toggleblock}>Войти</button>
                     <div className="mx-3" hidden={!toggleblock}>
                         <div class="spinner-border" role="status">
                             <span class="visually-hidden">Loading...</span>
