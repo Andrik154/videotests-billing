@@ -86,7 +86,7 @@ function App() {
         <header className="bg-dark text-white border-bottom">
           <div className="container-fluid col-12 col-md-10 col-lg-8">
             <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-              <Link href="/"><h4 id="logo" className="mb-0">TestiKi</h4></Link>
+              <Link href="/"><h4 id="logo" className="mb-0" style={{fontSize:'32px'}}>TestiKi</h4></Link>
               <ul className="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 ms-4" style={{fontWeight:700}}>
                 <li><Link href="/usertests" style={{textDecoration:'none'}} className="nav-link px-2 text-white">Тесты</Link></li>
                 <li><Link href="/pay" style={{textDecoration:'none'}} className="nav-link px-2 text-white">Пополнить</Link></li>
@@ -116,7 +116,7 @@ function App() {
           </div>
         </main>
         <footer className="border-top bg-light">
-          <div className="col-12 col-md-10 col-lg-8 mx-auto text-black py-2 px-2 pb-0">
+          <div className="col-12 col-md-10 col-lg-8 mx-auto my-auto text-black py-2 px-2 pb-0">
             By <a href="https://vk.com/gluchnosti" target="_blank" className="text-black" style={{textDecoration:"underline", color:"#AAAAAA"}}>gluchnosti</a>
           </div>
         </footer>

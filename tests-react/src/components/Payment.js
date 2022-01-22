@@ -143,7 +143,7 @@ function Payment(props){
         return <Redirect to="/signin"/>
     }
     return (
-        <div className="col-12 col-md-5 mx-auto mt-5 border rounded">  
+        <div className="col-12 col-md-7 mx-auto mt-5 border rounded">  
             <div className="border-bottom mb-1 px-3 pt-2 bg-light">
                 <h5>Пополнить счёт</h5>
             </div>
@@ -152,30 +152,35 @@ function Payment(props){
                     errors.map((key)=><div className="row text-danger mb-1"><div className="col-12">{errorsList[key].text}</div></div>)
                 }
                 <div className="row align-items-center">
-                    <label for="inputSum" className="col-4 col-form-label">Сумма*</label>
+                    <label for="inputSum" className="col-4 col-form-label" style={{fontSize:'18px'}}>Сумма*</label>
                     <div className="col-8">
                         <input name="inputSum" type="number" step="15.0" min="0" placeholder="150.00" className="w-100" defaultValue={ui} required/>
                     </div>
                 </div>
                 <div className="row align-items-center">
-                    <label for="inputPromo" className="col-4 col-form-label">Промокод</label>
+                    <label for="inputPromo" className="col-4 col-form-label" style={{fontSize:'18px'}}>Промокод</label>
                     <div className="col-8">
                         <input name="inputPromo" type="text" placeholder="AMOGA25" className="w-100"/>
                     </div>
                 </div>
                 <div className="row align-items-center">
-                    <label for="inputTotal" className="col-4 col-form-label">Итого:</label>
+                    <label for="inputTotal" className="col-4 col-form-label" style={{fontSize:'18px'}}>Итого:</label>
                     <div className="col-8">
                         <input name="inputTotal" type="text" placeholder="123.0" className="w-100"  value={`${(ui*multiplier).toFixed(2)} RUR`} disabled/>
                     </div>
                 </div>
                 <div className="d-flex align-items-center mt-2 mb-2">
-                    <button name="submit" type="submit" class="btn button-34 py-1" onClick={handlePayment} disabled={!ready}>Пополнить</button>
+                    <div className="col-4">
+                        <button name="submit" type="submit" class="btn button-34 py-1" onClick={handlePayment} disabled={!ready}>Пополнить</button>
+                    </div>
+                    <div className="col-8">
                     <button name="submit" type="" class="btn button-34 color-34 outlinebtn ms-2 py-1" onClick={handlePromo} disabled={!newPromo}>Проверить промо</button>
                     <div className="mx-3" >
                         <div class="spinner-border" role="status" hidden={!handling}>
                             <span class="visually-hidden">Loading...</span>
                         </div>
+                    </div>
+
                     </div>
                 </div>
             </form>

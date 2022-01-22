@@ -69,7 +69,7 @@ function Signin(props){
     }
     
     return(
-        <div className="col-12 col-md-5 rounded mx-auto mt-5 border rounded-0">
+        <div className="col-12 col-md-7 rounded mx-auto mt-5 border rounded-0">
             {loggedin&&<Redirect to="/" />}
             <div className="border-bottom mb-1 px-3 pt-2 bg-light">
                 <h5>Вход</h5>
@@ -81,14 +81,14 @@ function Signin(props){
                     </div>
                 </div>
                 <div className="row">
-                    <label for="inputLogin" className="col-4 col-form-label">Логин</label>
-                    <div className="col-8">
+                    <label for="inputLogin" className="col-4 col-form-label" style={{fontSize:'18px'}}>Логин</label>
+                    <div className="col-8 my-auto">
                         <input name="inputLogin" type="text" placeholder="2281488" className="w-100" defaultValue={savedcreds&&savedcreds[0]} disabled={toggleblock} required/>
                     </div>
                 </div>
                 <div className="row">
-                    <label for="inputPass" className="col-4 col-form-label">Пароль</label>
-                    <div className="col-8">
+                    <label for="inputPass" className="col-4 col-form-label" style={{fontSize:'18px'}}>Пароль</label>
+                    <div className="col-8 my-auto">
                         <input name="inputPass" type="text" placeholder="3ad6" className="w-100" defaultValue={savedcreds&&savedcreds[1]} disabled={toggleblock} required/>
                     </div>
                 </div>
