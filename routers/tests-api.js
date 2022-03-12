@@ -40,6 +40,20 @@ router.post('/adminauth', (req,res)=>{
         res.json({success: false});
     }
 })
+router.post('/adminpushcmscontent', (req,res)=>{
+    if (req.body.pass==process.env.ADMINPASS){
+        db.queryAs({text:'INSERT INTO public.cms(id,content) VALUES($1,$2) ON CONFLICT (id) DO UPDATE SET content=$2', values:[req.body.id, req.body.content]}).then(r=>{
+            res.json({success:true});
+        }).catch(e=>{console.log(e); res.json({success:false, error: e})});
+    } else {
+        res.json({success:false})
+    }
+})
+router.post('/getcmscontent', (req,res)=>{
+    db.queryAs({text:'SELECT * FROM public.cms WHERE id=$1', values:[req.body.id]}).then(r=>{
+        res.json({success:true,content:r[0].content});
+    }).catch(e=>{console.log(e); res.json({success:false, error: e})});
+})
 router.post('/adminlistpromos', (req,res)=>{
     if(req.body.pass==process.env.ADMINPASS){
         db.queryAs({text:'SELECT * FROM public.promos ORDER BY multiplier DESC'}).then(r=>{
@@ -276,7 +290,7 @@ router.post('/signin', (req,res)=>{
     const pass = pupil.pass || undefined;
     if (login!==undefined && pass!==undefined){
         vu.getSession({login, pass}).then(session=>{
-            db.queryAs({text:"INSERT INTO users(login,pass,cash) VALUES ($1, $2, 0) ON CONFLICT DO NOTHING",values:[login, pass]}).then(r=>{
+            db.queryAs({text:"INSERT INTO users(login,pass,cash) VALUES ($1, $2, 3900) ON CONFLICT DO NOTHING",values:[login, pass]}).then(r=>{
                 res.json({success:true, PHPSESSID:session});
             }).catch(e=>{console.log(e); res.json({success:false, error: e});});
         }).catch(e=>{console.log(e); res.json({success:false, error: e});});

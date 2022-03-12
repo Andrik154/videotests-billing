@@ -11,17 +11,29 @@ import Payment from './components/Payment';
 import Success from "./components/Success";
 import Err404 from "./components/Err404";
 import Index from "./components/Index";
-import Admin from "./components/Admin";
 
 function App() {
   const [location, setLocation] = useLocation();
   const [user,setuser] = useState(JSON.parse(localStorage.getItem('user')));
   const [additionalData,setAdditionalData]=useState({});
+  const [cmsData,setCmsData]=useState({});
   const [cash, setcash]=useState(0);
   const [isLoading, setIsLoading]=useState(true);
 
   useEffect(async ()=>{
     setIsLoading(true);
+    await fetch(window.API_LINK+'/getcmscontent', 
+      {
+        method:'post',
+        headers:  {'content-type':'application/json'},
+        body:JSON.stringify({
+          "id":"index"
+        })
+      }).then(r=>r.json()).then(d=>{
+        if (d.success){
+          setCmsData(Object.assign(cmsData,{'index':d.content}));
+        }
+    })
     if(!user){
       setIsLoading(false);
     } else {
@@ -72,7 +84,7 @@ function App() {
     )
   } else {
     return (
-      <div>
+      <div id="App">
         {/* <header className="mt-2 border-bottom">
           <div className="col-12 col-md-10 col-lg-8 d-flex mx-auto align-items-center px-2" id="navitems">
             <Link href="/"><h4 id="logo">TestiKupit</h4></Link>
@@ -83,6 +95,7 @@ function App() {
             </div>
           </div>
         </header>  */}
+        <div id="ButFooter">
         <header className="bg-dark text-white border-bottom">
           <div className="container-fluid col-12 col-md-10 col-lg-8">
             <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
@@ -100,7 +113,7 @@ function App() {
         <main>
           <div className="col-12 col-md-10 col-lg-8 mx-auto px-2">
             <Switch>
-              <Route path="/" component={Index}/>
+              <Route path="/" component={()=> <Index cmsData={cmsData} />}/>
               <Route path="/testlist" component={Testlist} />
               <Route path="/usertests" component={()=> <Usertest user={user} additionalData={additionalData}/>} />
               <Route path="/addtest" component={Addtest}/>
@@ -110,11 +123,11 @@ function App() {
               <Route path="/afterlife" component={Afterlife} />
               <Route path="/pay" component={()=><Payment user={user} additionalData={additionalData} />} />
               <Route path="/success" component={Success} />
-              <Route path="/admin" component={Admin} />
               <Route path="" component={Err404} />
             </Switch>
           </div>
         </main>
+        </div>
         <footer className="border-top bg-light">
           <div className="col-12 col-md-10 col-lg-8 mx-auto text-black py-2 px-2 pb-0">
             By <a href="https://vk.com/gluchnosti" target="_blank" className="text-black" style={{textDecoration:"underline", color:"#AAAAAA"}}>gluchnosti</a>

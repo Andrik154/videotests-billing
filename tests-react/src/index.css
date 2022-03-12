@@ -23,18 +23,21 @@ p{
 #acc{
   cursor:pointer;
 }
+#ButFooter{
+  min-height: calc(100vh - 4.5vh);
+}
 footer{
-  position:absolute;
-  bottom:0;
+  /* position:absolute; */
+  /* bottom:0; */
   height:4.5vh;
   width:100%;
 }
-header{
+ header{
   max-height:20vh;
-}
+} 
 main{
-  max-height:75vh;
-}
+  /* min-height:calc(100vh - 4.5vh); */
+} 
 #loadscreen{
   width:30vw;
   height:100vh;

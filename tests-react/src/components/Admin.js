@@ -1,5 +1,48 @@
 import { useEffect, useState } from "react";
 
+const getCmsContent = (e, pass)=>{
+    e.preventDefault();
+    const form = e.currentTarget;
+    const id = form.elements.id.value;
+    form.elements.button.setAttribute('disabled', false);
+    fetch(window.API_LINK+'/getcmscontent',{
+        method: 'POST',
+        headers: {
+            'content-type':'application/json'
+        },
+        body: JSON.stringify({
+            pass: pass,
+            id: id
+        })
+    }).then(r=>r.json()).then(d=>{
+        let html = d.content;
+        form.elements.text.value=html;
+        form.elements.button.removeAttribute('disabled');
+    })
+}
+
+const pushCmsContent = (e, pass)=>{
+    e.preventDefault();
+    const form = e.currentTarget;
+    const id = form.elements.id.value;
+    const text = form.elements.text.value;
+    form.elements.button.setAttribute('disabled', false);
+    fetch(window.API_LINK+'/adminpushcmscontent',{
+        method: 'POST',
+        headers: {
+            'content-type':'application/json'
+        },
+        body: JSON.stringify({
+            pass: pass,
+            id: id,
+            content:text
+        })
+    }).then(r=>r.json()).then(d=>{
+        d.success?alert('OK'):alert('NOT OK ERR\n');
+        form.elements.button.removeAttribute('disabled');
+    })
+}
+
 const listorders = (e, pass)=>{
     e.preventDefault();
     const form = e.currentTarget;
@@ -224,6 +267,31 @@ function Admin(){
                     <button name="button">List</button>
                 </form>
                 <hr />
+                <form onSubmit={(e)=>getCmsContent(e,adminpass)}>
+                    <h5>Get CMS content</h5>
+                    <input name="id" value="index" /> <br />
+                    <textarea name="text"></textarea> <br />
+                    <button name="button">Get</button>
+                </form>
+                <hr />
+                <form onSubmit={(e)=>pushCmsContent(e,adminpass)}>
+                    <h5>Push CMS content</h5>
+                    <input name="id" value="index" /> <br />
+                    <textarea name="text"></textarea> <br />
+                    <button name="button">Push</button>
+                </form>
+                <style>
+                    {`body{
+                        padding: 10px 0 40px 10px;
+                    }
+                    input{
+                        margin-right: 5px;
+                        margin-bottom: 5px;
+                    }
+                    form{
+                        margin-bottom:10px;
+                    }`}
+                </style>
             </>
         )
     }
